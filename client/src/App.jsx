@@ -6,6 +6,7 @@ import SignIn from './pages/SignIn'
 import Projects from './pages/Projects'
 import SignUp from './pages/SignUp'
 import Header from './components/Header.jsx'
+import FooterComponent from './components/FooterComponent.jsx'
 function App() 
 {
   return (
@@ -19,6 +20,7 @@ function App()
       <Route path='/sign-in' element={<SignIn/>}/>
       <Route path='sign-up' element={<SignUp/>}/>
     </Routes>
+    <FooterComponent/>
     </BrowserRouter>
   )
 }
