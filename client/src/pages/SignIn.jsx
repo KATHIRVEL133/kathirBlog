@@ -1,41 +1,43 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/no-unescaped-entities */
 import { Alert, Button, Label, Spinner, TextInput } from "flowbite-react";
-import { lazy, useState } from "react";
+import {  useState } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { useDispatch,useSelector } from "react-redux"; 
+import { signInFailure, signInStart, signInSuccess } from "../redux/user/userSlice";
 export default function SignIn() {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [loading,setLoading] = useState(false);
-  const [error,setError] = useState(null);
+  const {loading,error}  = useSelector((state)=>state.user)
   const [formData,setFormData] = useState({});
   const handleSubmit = async (e)=>
   {
   e.preventDefault();
-  if(!e.target.value||e.target.value==='') setError('All fields are required');
+  if(!e.target.value||e.target.value==='') dispatch(signInFailure('All fields are required'));
   try
   {
-   setLoading(true);
-   setError(null);
+   dispatch(signInStart());
    const res = await fetch('/api/auth/signin',{
-    method:'POST',
+    method:'post',
     headers:{
       'Content-Type':'application/json',
     },
     body:JSON.stringify(formData)
    })
    const data = await res.json();
-   setLoading(false);
+ 
    if(data.success===false)
    {
-    setError(data.message);
+    dispatch(signInFailure(data.message));
     return;
    }
+   dispatch(signInSuccess(data));
    navigate('/');
   }
   catch(error)
   {
-    setError(error);
+    dispatch(signInFailure(error));
   }
   }
   const handleChange =  (e) =>
@@ -82,7 +84,7 @@ export default function SignIn() {
       </Link>
      </div>
      { 
-      error&&<Alert className="mt-3" color='failure'>{error}</Alert>
+    error&&<Alert className="mt-3" color='failure'>{error}</Alert>
      }
     </div>
     </div>
