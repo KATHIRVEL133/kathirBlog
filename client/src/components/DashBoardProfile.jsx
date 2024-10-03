@@ -72,6 +72,7 @@ export default function DashBoardProfile() {
         <input type="file" accept="image/*" hidden  onChange={handleImageChange} ref={filePickerRef}>
         </input>
       <div className=" relative w-32 h-32 rounded-full overflow-hidden shadow-md self-center cursor-pointer" onClick={()=>filePickerRef.current.click()}>
+        <img src={imageFileURL||currentUser.profilePicture} className={`w-full h-full object-cover rounded-full   border-8 border-[lightgray] ${imageUploadProgress&&imageUploadProgress<100&&'opacity-60'}`}/>
       {imageUploadProgress && (
             <CircularProgressbar
               value={imageUploadProgress || 0}
@@ -93,7 +94,6 @@ export default function DashBoardProfile() {
               }}
             />
           )}
-        <img src={imageFileURL||currentUser.profilePicture} className={`w-full h-full object-cover rounded-full   border-8 border-[lightgray] ${imageUploadProgress&&imageUploadProgress<100&&'opacity-60'}`}/>
        
       </div>
       {
