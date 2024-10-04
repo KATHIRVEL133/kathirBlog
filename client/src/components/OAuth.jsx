@@ -1,11 +1,13 @@
-import { Button } from "flowbite-react";
+/* eslint-disable no-unused-vars */
+import {  Button } from "flowbite-react";
 import {AiFillGoogleCircle} from 'react-icons/ai'
 import {GoogleAuthProvider, signInWithPopup,getAuth} from 'firebase/auth'
 import { app } from "../firebase";
-import {useDispatch} from 'react-redux'
-import {signInSuccess} from '../redux/user/userSlice.js'
+import {useDispatch, useSelector} from 'react-redux'
+import {signInSuccess,signInFailure} from '../redux/user/userSlice.js'
 import { useNavigate } from "react-router-dom";
 export default function OAuth() {
+  const {error} = useSelector((state)=> state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
     const auth = getAuth(app); 
@@ -16,6 +18,7 @@ export default function OAuth() {
     try
     {
         const resultsFromGoogle = await signInWithPopup(auth,provider)
+        console.log(resultsFromGoogle);
         const res = await fetch('/api/auth/google',{
           method:'POST',
           headers:{
@@ -24,19 +27,24 @@ export default function OAuth() {
           body:JSON.stringify({
             name:resultsFromGoogle.user.displayName,
             email:resultsFromGoogle.user.email,
-            photoUrlFromGoogle:resultsFromGoogle.user.photoURL
+            profilePicture:resultsFromGoogle.user.photoURL,
           })
         });
         const data = await res.json();
         if(res.ok)
         {
+  
           dispatch(signInSuccess(data));
           navigate('/');
         }
+        else
+        {
+          dispatch(signInFailure(data.message));
+        }
     } 
-    catch(error)
+    catch(e)
     {
-        console.log(error);
+        dispatch(signInFailure(error))
     }
     }
   return (
@@ -44,5 +52,6 @@ export default function OAuth() {
        <AiFillGoogleCircle className='w-6 h-6 mr-3'/>
         Continue with google
     </Button>
+   
   )
 }
