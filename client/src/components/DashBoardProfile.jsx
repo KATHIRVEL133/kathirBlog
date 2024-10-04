@@ -1,12 +1,14 @@
+/* eslint-disable react/no-unescaped-entities */
 /* eslint-disable no-unused-vars */
-import { Alert, Button, TextInput } from "flowbite-react"
+import { Alert, Button, Modal, TextInput } from "flowbite-react"
 import { useEffect, useRef, useState } from "react"
 import { useSelector,useDispatch } from "react-redux"
 import { app } from "../firebase";
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import {getDownloadURL, getStorage, ref, uploadBytesResumable} from "firebase/storage"
-import { updateFailure, updateStart, updateSuccess } from "../redux/user/userSlice.js";
+import { deleteUserFailure, deleteUserStart, deleteUserSuccess, updateFailure, updateStart, updateSuccess } from "../redux/user/userSlice.js";
+import {HiOutlineExclamationCircle} from 'react-icons/hi'
 export default function DashBoardProfile() {
    const dispatch = useDispatch();
    const {currentUser,loading,error} = useSelector((state)=>state.user)
@@ -17,6 +19,7 @@ export default function DashBoardProfile() {
    const [imageUploadError,setImageUploadError] = useState(null); 
    const [formData,setFormData] = useState({});
   const [updateUserSuccess,setUserUpdateSuccess] = useState('');
+  const [showModal,setShowModal] = useState(false);
    const handleImageChange = (e)=>
    {
    const file = e.target.files[0];
@@ -101,6 +104,31 @@ export default function DashBoardProfile() {
       dispatch(updateFailure(error));
     }
    }
+   const handleDeleteUser = async (e)=>
+   {
+    setShowModal(false);
+    e.preventDefault();
+    try
+    {
+    dispatch(deleteUserStart());
+    const res = await fetch(`/api/user/delete/${currentUser._id}`,{
+      method:'DELETE',
+    });
+    const data = await res.json();
+    if(!res.ok)
+    {
+      dispatch(deleteUserFailure(data.message));
+    }
+    else
+    {
+      dispatch(deleteUserSuccess(data));
+    }
+    }
+    catch(error)
+    {
+      dispatch(deleteUserFailure(error));
+    }
+   }
   return (
     <div className=" max-w-lg mx-auto  p-3 w-full">
       <h1 className="text-center my-7 font-semibold text-3xl">
@@ -155,13 +183,35 @@ export default function DashBoardProfile() {
       }
       </form>
       <div className="flex justify-between text-red-500 mt-5 ">
-        <span className="cursor-pointer">
+        <span onClick={()=> setShowModal(true)} className="cursor-pointer">
             Delete Account
         </span>
         <span className="cursor-pointer">
             Sign Out
         </span>
       </div>
+      {
+        showModal&&
+        <Modal show={showModal} popup onClose={()=>setShowModal(false)} size='md'>
+        <Modal.Header/>
+        <Modal.Body>
+         <div className="text-center">
+         <HiOutlineExclamationCircle className="h-14 w-14 text-gray-400 dark:text-gray-200  mb-4 mx-auto"/>
+         <h3 className="mb-5 text-lg text-gray-500 dark:text-gray-400">
+          Are you sure you want to delete your account?
+         </h3>
+         <div className="flex justify-between"> 
+         <Button color='failure' onClick={handleDeleteUser}> 
+          Yes,I'm Sure
+         </Button>
+         <Button onClick={()=>setShowModal(false)} color='success'>
+          No,Cancel
+         </Button>
+         </div>
+         </div>
+        </Modal.Body>
+        </Modal>
+      }
     </div>
   )
 }
