@@ -1,19 +1,22 @@
 /* eslint-disable no-unused-vars */
 import { Alert, Button, TextInput } from "flowbite-react"
 import { useEffect, useRef, useState } from "react"
-import { useSelector } from "react-redux"
+import { useSelector,useDispatch } from "react-redux"
 import { app } from "../firebase";
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import {getDownloadURL, getStorage, ref, uploadBytesResumable} from "firebase/storage"
+import { updateFailure, updateStart, updateSuccess } from "../redux/user/userSlice.js";
 export default function DashBoardProfile() {
-   const {currentUser} = useSelector((state)=>state.user)
+   const dispatch = useDispatch();
+   const {currentUser,loading,error} = useSelector((state)=>state.user)
    const [imageFile,setImageFile] = useState(null);
    const [imageFileURL,setImageFileURL] = useState(null);
    const filePickerRef = useRef(null);
    const [imageUploadProgress,setImageUploadProgress] = useState(0);
    const [imageUploadError,setImageUploadError] = useState(null); 
-  
+   const [formData,setFormData] = useState({});
+  const [updateUserSuccess,setUserUpdateSuccess] = useState('');
    const handleImageChange = (e)=>
    {
    const file = e.target.files[0];
@@ -59,16 +62,51 @@ export default function DashBoardProfile() {
     ()=>{
       getDownloadURL(uploadTask.snapshot.ref).then((downloadURL)=>{
         setImageFileURL(downloadURL);
+        setFormData({...formData,profilePicture:downloadURL});
       })
     }
   )
+   }
+   const handleChange = (e)=>
+   {
+    setFormData({...formData,[e.target.id]:e.target.value});
+   }
+   const handleSubmit = async (e)=> 
+   {
+    e.preventDefault();
+    if(Object.keys(formData).length===0) return ;
+    try
+    {
+    dispatch(updateStart());
+    const res = await fetch(`/api/user/update/${currentUser._id}`,{
+     method:'put',
+     headers:{
+      'Content-Type':'application/json'
+     },
+     body:JSON.stringify(formData)
+    });
+    const data = await res.json();
+    console.log(data);
+    if(!res.ok)
+    {
+    
+      dispatch(updateFailure(data.message));
+      return ;
+    }
+    dispatch(updateSuccess(data));
+    setUserUpdateSuccess('User updated Successfully');
+    }
+    catch(error)
+    {
+      dispatch(updateFailure(error));
+    }
    }
   return (
     <div className=" max-w-lg mx-auto  p-3 w-full">
       <h1 className="text-center my-7 font-semibold text-3xl">
         Profile
       </h1>
-      <form className="flex flex-col gap-6 ">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-6 ">
         <input type="file" accept="image/*" hidden  onChange={handleImageChange} ref={filePickerRef}>
         </input>
       <div className=" relative w-32 h-32 rounded-full overflow-hidden shadow-md self-center cursor-pointer" onClick={()=>filePickerRef.current.click()}>
@@ -99,12 +137,22 @@ export default function DashBoardProfile() {
       {
         imageUploadError&& <Alert color='failure'>{imageUploadError}</Alert>
       }
-      <TextInput type="text" id="username" placeholder="username" defaultValue={currentUser.username}/>
-      <TextInput type="email" id="email" placeholder="email" defaultValue={currentUser.email}/>
-      <TextInput type="password" id="password" placeholder="password" />
-      <Button type="submit" gradientDuoTone='purpleToBlue' outline>
-        Update
+      <TextInput type="text" id="username" placeholder="username" defaultValue={currentUser.username} onChange={handleChange} />
+      <TextInput type="email" id="email" placeholder="email" defaultValue={currentUser.email} onChange={handleChange}/>
+      <TextInput type="password" id="password" placeholder="password" onChange={handleChange} />
+      <Button disabled={loading}  type="submit" gradientDuoTone='purpleToBlue' outline>
+        {loading?'Updating':'Update'}
       </Button>
+      {
+        error&&<Alert color='failure'>
+          {error}
+        </Alert>
+      }
+      {
+        updateUserSuccess&&<Alert color='success'>
+          {updateUserSuccess}
+        </Alert>
+      }
       </form>
       <div className="flex justify-between text-red-500 mt-5 ">
         <span className="cursor-pointer">
