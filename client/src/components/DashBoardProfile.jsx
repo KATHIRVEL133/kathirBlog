@@ -9,6 +9,7 @@ import 'react-circular-progressbar/dist/styles.css';
 import {getDownloadURL, getStorage, ref, uploadBytesResumable} from "firebase/storage"
 import { deleteUserFailure, deleteUserStart, deleteUserSuccess, signOutSuccess, updateFailure, updateStart, updateSuccess } from "../redux/user/userSlice.js";
 import {HiOutlineExclamationCircle} from 'react-icons/hi'
+import { Link } from "react-router-dom";
 export default function DashBoardProfile() {
    const dispatch = useDispatch();
    const {currentUser,loading,error} = useSelector((state)=>state.user)
@@ -20,6 +21,7 @@ export default function DashBoardProfile() {
    const [formData,setFormData] = useState({});
   const [updateUserSuccess,setUserUpdateSuccess] = useState('');
   const [showModal,setShowModal] = useState(false);
+  const [imageFileUploading,setImageUploading] = useState(false);
    const handleImageChange = (e)=>
    {
    const file = e.target.files[0];
@@ -49,6 +51,7 @@ export default function DashBoardProfile() {
     //   }
     // }
     setImageUploadError(null);
+    setImageUploading(true);
     const storage = getStorage(app);
     const fileName = new Date().getTime() + imageFile.name;
     const storageRef = ref(storage,fileName);
@@ -66,6 +69,7 @@ export default function DashBoardProfile() {
       getDownloadURL(uploadTask.snapshot.ref).then((downloadURL)=>{
         setImageFileURL(downloadURL);
         setFormData({...formData,profilePicture:downloadURL});
+        setImageUploading(false);
       })
     }
   )
@@ -191,9 +195,17 @@ export default function DashBoardProfile() {
       <TextInput type="text" id="username" placeholder="username" defaultValue={currentUser.username} onChange={handleChange} />
       <TextInput type="email" id="email" placeholder="email" defaultValue={currentUser.email} onChange={handleChange}/>
       <TextInput type="password" id="password" placeholder="password" onChange={handleChange} />
-      <Button disabled={loading}  type="submit" gradientDuoTone='purpleToBlue' outline>
+      <Button disabled={loading||imageFileUploading}  type="submit" gradientDuoTone='purpleToBlue' outline>
         {loading?'Updating':'Update'}
       </Button>
+      {currentUser.isAdmin&&(
+        <Link to={'/create-post'}>
+      <Button type="button" gradientDuoTone='purpleToPink' outline className="w-full">
+        Create Post
+      </Button>
+        </Link>
+      )
+      }
       {
         error&&<Alert color='failure'>
           {error}
