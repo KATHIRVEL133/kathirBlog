@@ -5,14 +5,14 @@ import { useEffect, useState } from "react";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { app } from "../firebase";
-
+import {useNavigate} from 'react-router-dom'
 export default function CreatePost() {
   const [imageFile,setImageFile] = useState([]);
   const [imageFileUrl,setImageFileUrl] = useState([]);
   const [imageUploadError,setImageUploadError] = useState(null);
   const [imageUploadProgress,setImageUplaodProgress] = useState(0);
   const [publishError,setPublishError] = useState(null);
- 
+  const navigate = useNavigate();
   const [formData,setFormData] = useState({
     image:[],
   });
@@ -88,7 +88,7 @@ export default function CreatePost() {
   setPublishError(data.message);
   return;
  }
- console.log(data);
+ navigate(`/post/${data.slug}`);
  }
  catch(error)
  {
