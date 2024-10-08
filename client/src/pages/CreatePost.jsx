@@ -5,15 +5,18 @@ import { useEffect, useState } from "react";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { app } from "../firebase";
-import { CircularProgressbar } from "react-circular-progressbar";
-
 
 export default function CreatePost() {
   const [imageFile,setImageFile] = useState([]);
   const [imageFileUrl,setImageFileUrl] = useState([]);
   const [imageUploadError,setImageUploadError] = useState(null);
   const [imageUploadProgress,setImageUplaodProgress] = useState(0);
-  console.log(imageFileUrl);
+  const [publishError,setPublishError] = useState(null);
+ 
+  const [formData,setFormData] = useState({
+    image:[],
+  });
+  console.log(formData);
   const handleImageFileChange = (e)=>
   {
 
@@ -62,20 +65,47 @@ export default function CreatePost() {
     getDownloadURL(uploadTask.snapshot.ref).then((downloadUrl)=>
     {
       setImageFileUrl((prevImageFileUrl)=> [...prevImageFileUrl,downloadUrl]);
+      setFormData({...formData,...formData.image.push(downloadUrl)});
     })
   });
   }
+ const handleSubmit = async (e)=>
+ {
+ e.preventDefault();
+ try
+ {
+ setPublishError(null);
+ const res = await fetch('/api/post/publish',{
+  method:'post',
+  headers:{
+    'Content-Type':'application/json'
+  },
+  body:JSON.stringify(formData)
+ });
+ const data = await res.json();
+ if(!res.ok)
+ {
+  setPublishError(data.message);
+  return;
+ }
+ console.log(data);
+ }
+ catch(error)
+ {
+ setPublishError(error);
+ }
+ }
   return (
     <div className="min-h-screen max-w-3xl mx-auto p-3">
       <h1 className="text-center text-3xl font-semibold my-7">
         Create a Post
       </h1>
-      <form className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div className="flex flex-col sm:flex-row gap-4 justify-between">
-       <TextInput type="text" placeholder="Title" required id="title" className="flex-1">
+       <TextInput type="text" placeholder="Title" required id="title" className="flex-1" onChange={(e)=> setFormData({...formData,title:e.target.value})}>
 
        </TextInput>
-       <Select>
+       <Select id="category" onChange={(e)=> setFormData({...formData,category:e.target.value})}>
         <option value="uncategorized">
           Select a category
         </option>
@@ -111,10 +141,15 @@ export default function CreatePost() {
             {imageUploadError}
           </Alert>
         }
-        <ReactQuill theme="snow" placeholder="write something..." className="h-72 mb-12" id="content" required/>
+        <ReactQuill theme="snow" placeholder="write something..." className="h-72 mb-12" onChange={(value)=>setFormData({...formData,content:value})}  id="content" required/>
         <Button type="submit" gradientDuoTone='purpleToPink'>
             Publish
         </Button>
+        {
+          publishError&&<Alert color='failure'>
+            {publishError}
+          </Alert>
+        }
       </form>
     </div>
   )
