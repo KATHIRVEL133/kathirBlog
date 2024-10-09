@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 export default function DashBoardPosts() {
   const {currentUser} = useSelector((state)=>state.user);
   const [userposts,setUserPosts] = useState([]);
+  const [showMore,setShowMore] = useState(true);
   console.log(userposts);
   useEffect(()=>{
      const fetchposts = async ()=>{
@@ -16,6 +17,10 @@ export default function DashBoardPosts() {
         if(res.ok)
         {
           setUserPosts(data.posts);
+          if(data.posts.length<9)
+          {
+            setShowMore(false);
+          }
         }
       }
       catch(error)
@@ -28,7 +33,28 @@ export default function DashBoardPosts() {
       fetchposts();
      }
   },[currentUser._id])
-  return <div className="table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thum-slate-500">
+  const handleShowMore = async ()=>
+  {
+    const startIndex = userposts.length;
+    try
+    {
+      const res = await fetch(`/api/post/getposts?userId=${currentUser._id}&startIndex=${startIndex}`);
+      const data = await res.json();
+      if(res.ok)
+      {
+       setUserPosts((prev)=>[...prev,...data.posts]);
+       if(data.posts.length<9)
+       {
+        setShowMore(false);
+       }
+      }
+    }
+    catch(error)
+    {
+      console.log(error.message);
+    }
+  }
+  return <div className="w-full table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thum-slate-500">
     {
       currentUser.isAdmin&&userposts.length>0?<>
       <Table  hoverable className="shadow-md">
@@ -81,12 +107,19 @@ export default function DashBoardPosts() {
             </Table.Cell>
             </Table.Row>
           </Table.Body>
+       
         )
         )
       }
        
       </Table>
       </>:'You dont have an post yet'
+     
     }
+     {
+        showMore&&<button onClick={handleShowMore} className="w-full self-center text-teal-500 py-7 text-sm">
+          Show More...
+        </button>
+      }
   </div>
 }
