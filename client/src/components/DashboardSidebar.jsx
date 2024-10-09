@@ -51,7 +51,7 @@ export default function DashboardSidebar() {
                 {
                   currentUser.isAdmin&&
                   <Link to={'/dashboard?tab=posts'}>
-                   <Sidebar.Item active={tab==='posts'} icon={HiDocumentText}>
+                   <Sidebar.Item  active={tab==='posts'} icon={HiDocumentText}>
                     Posts
                    </Sidebar.Item>
                   </Link>
