@@ -26,6 +26,33 @@ catch(error)
     next(error);
 }
 }
+export const updatePost = async (req,res,next)=>
+{
+    if(req.user.id!==req.params.userId) return next(403,'You are not allowed to update');
+    if(!req.user.isAdmin)
+    {
+        return next(errorHandler(400,'You are not an admin'));
+    } 
+    try
+    {
+      const updatedPost =  await Post.findByIdAndUpdate(req.params.postId,{
+        $set:{
+            title:req.body.title,
+            category:req.body.category,
+            content:req.body.content,
+            image:req.body.image
+        }
+    },{
+        new:true
+    }
+      );
+      res.status(200).json(updatedPost);
+    }
+    catch(error)
+    {
+        next(error);
+    }
+}
 export const getposts = async (req,res,next)=>
 {
 try
@@ -65,6 +92,19 @@ catch(error)
 {
     next(error);
 }
+}
+export const getPost = async (req,res,next)=>
+{
+   
+    try
+    {
+      const post = await Post.findById(req.params.postId);
+      res.status(200).json(post);
+    }
+    catch(error)
+    {
+        next(error);
+    }
 }
 export const deletePost = async (req,res,next)=>
 {
