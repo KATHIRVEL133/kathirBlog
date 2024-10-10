@@ -1,12 +1,16 @@
+/* eslint-disable react/no-unescaped-entities */
 /* eslint-disable no-unused-vars */
-import { Table } from "flowbite-react";
+import { Button, Modal, Table } from "flowbite-react";
 import { useEffect, useState } from "react"
+import { HiOutlineExclamationCircle } from "react-icons/hi";
 import { useSelector } from "react-redux"
 import { Link } from "react-router-dom";
 export default function DashBoardPosts() {
   const {currentUser} = useSelector((state)=>state.user);
   const [userposts,setUserPosts] = useState([]);
   const [showMore,setShowMore] = useState(true);
+  const [showModal,setShowModal] = useState(false);
+  const [postDeleteId,setPostDeleteId] = useState('');
   console.log(userposts);
   useEffect(()=>{
      const fetchposts = async ()=>{
@@ -54,6 +58,29 @@ export default function DashBoardPosts() {
       console.log(error.message);
     }
   }
+  const handleDeleteUser = async (e)=>
+  {
+    // e.preventDefault();
+    setShowModal(false);
+    try
+    {
+     const res = await fetch(`/api/post/deletePost/${postDeleteId}/${currentUser._id}`,{
+      method:'Delete',
+     });
+     const data = await res.json();
+   
+     if(data.success===false)
+     {
+      console.log(data.message);
+      return ;
+     }
+    setUserPosts((prev)=> prev.filter((post)=>post._id!==postDeleteId));
+    }
+    catch(error)
+    {
+      console.log(error);
+    }
+  }
   return <div className="w-full table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thum-slate-500">
     {
       currentUser.isAdmin&&userposts.length>0?<>
@@ -63,7 +90,7 @@ export default function DashBoardPosts() {
           <Table.HeadCell>Post image</Table.HeadCell>
           <Table.HeadCell>Post title</Table.HeadCell>
           <Table.HeadCell>Category</Table.HeadCell>
-          <Table.HeadCell>Delete</Table.HeadCell>
+          <Table.HeadCell >Delete</Table.HeadCell>
           <Table.HeadCell>
             <span>
             Edit
@@ -94,7 +121,10 @@ export default function DashBoardPosts() {
               {post.category}
             </Table.Cell>
             <Table.Cell>
-              <span className="font-medium text-red-500 hover:underline cursor-pointer">
+              <span onClick={()=>{
+            setShowModal(true);
+            setPostDeleteId(post._id);
+          }} className="font-medium text-red-500 hover:underline cursor-pointer">
                 Delete
               </span>
             </Table.Cell>
@@ -120,6 +150,28 @@ export default function DashBoardPosts() {
         showMore&&<button onClick={handleShowMore} className="w-full self-center text-teal-500 py-7 text-sm">
           Show More...
         </button>
+      }
+        {
+        showModal&&
+        <Modal show={showModal} popup onClose={()=>setShowModal(false)} size='md'>
+        <Modal.Header/>
+        <Modal.Body>
+         <div className="text-center">
+         <HiOutlineExclamationCircle className="h-14 w-14 text-gray-400 dark:text-gray-200  mb-4 mx-auto"/>
+         <h3 className="mb-5 text-lg text-gray-500 dark:text-gray-400">
+          Are you sure you want to delete this Post?
+         </h3>
+         <div className="flex justify-between"> 
+         <Button color='failure' onClick={handleDeleteUser}> 
+          Yes,I'm Sure
+         </Button>
+         <Button onClick={()=>setShowModal(false)} color='success'>
+          No,Cancel
+         </Button>
+         </div>
+         </div>
+        </Modal.Body>
+        </Modal>
       }
   </div>
 }
