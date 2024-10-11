@@ -4,6 +4,7 @@ import { useLocation } from "react-router-dom"
 import DashboardSidebar from "../components/DashboardSidebar";
 import DashboardProfile from "../components/DashBoardProfile";
 import DashBoardPosts from "../components/DashBoardPosts";
+import DashBoardUsers from "../components/DashBoardUsers";
 export default function Dashboard() {
   const location = useLocation();
   const [tab,setTab] = useState('');
@@ -25,6 +26,9 @@ export default function Dashboard() {
       }
       {
         tab==='posts'&&<DashBoardPosts/>
+      }
+      {
+        tab==='users'&&<DashBoardUsers/>
       }
     </div>
   )

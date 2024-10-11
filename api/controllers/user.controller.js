@@ -124,3 +124,19 @@ catch(error)
     next(error);
 }
 }
+export const deleteUser2 = async (req,res,next)=>
+    {
+        if(!req.user.isAdmin||req.user.id!==req.params.userId)
+        {
+            return next(errorHandler(403,'You are not allowed to delete this user'));
+        }
+        try
+        {
+            await Post.findByIdAndDelete(req.params.deleteUserId);
+            res.status(200).json('User has been successfully deleted');
+        }
+        catch(error)
+        {
+            next(error);
+        }
+    }
