@@ -44,7 +44,6 @@ export default function UpdatePost() {
   console.log(formData);
   const handleImageFileChange = (e)=>
   {
-
    for(let i=0;i<e.target.files.length;i++)
    {
      const file = e.target.files[i];
@@ -90,10 +89,12 @@ export default function UpdatePost() {
     getDownloadURL(uploadTask.snapshot.ref).then((downloadUrl)=>
     {
       setImageFileUrl((prevImageFileUrl)=> [...prevImageFileUrl,downloadUrl]);
+      setFormData({...formData,...formData.image.splice(0,formData.image.length)});
       setFormData({...formData,...formData.image.push(downloadUrl)});
     })
   });
   }
+  
  const handleSubmit = async (e)=>
  {
  e.preventDefault();

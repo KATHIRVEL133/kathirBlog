@@ -101,7 +101,6 @@ export default function DashBoardPosts() {
             <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-900">
             <Table.Cell>{new Date(user.updatedAt).toLocaleDateString()}</Table.Cell>
             <Table.Cell>
-            
               <img src={user.profilePicture}
                alt={user.username}
                className="w-10 h-10 object-cover bg-gray-500 rounded-full"
