@@ -125,7 +125,7 @@ catch(error)
 }
 }
 export const deleteUser2 = async (req,res,next)=>
-    {
+{
         if(!req.user.isAdmin||req.user.id!==req.params.userId)
         {
             return next(errorHandler(403,'You are not allowed to delete this user'));
@@ -139,4 +139,21 @@ export const deleteUser2 = async (req,res,next)=>
         {
             next(error);
         }
+}
+export const getUser = async (req,res,next)=>
+{
+    try
+    {
+    const user = await User.findOne({_id:req.params.userId});
+    if(!user)
+    {
+        return next(errorHandler(403,'User not found'));
     }
+    const {password,...rest} = user._doc;
+    res.status(200).json(rest);
+    }
+    catch(error)
+    {
+        next(error);
+    }
+}
