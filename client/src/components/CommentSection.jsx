@@ -1,15 +1,14 @@
 
 import { useSelector } from "react-redux"
-import { Link } from "react-router-dom";
+import { Link,useNavigate} from "react-router-dom";
 import {Alert, Button, Textarea} from 'flowbite-react'
 import { useEffect, useState } from "react";
 import Comment from "./Comment.jsx";
 export default function CommentSection(post) {
-  
+    const navigate = useNavigate();
     const {currentUser} = useSelector((state)=>state.user);
     const [comment,setComment] = useState('');
     const [comments,setComments] = useState([]);
-    console.log(comments);
     const [commentError,setCommentError] = useState(null);
     useEffect(()=>
     {
@@ -68,6 +67,36 @@ export default function CommentSection(post) {
       setCommentError(error);
      }
     }  
+    const handleLike = async (commentId)=>
+    {
+      try
+      {
+       if(!currentUser)
+       {
+       navigate('/sign-in');
+       return ;
+       }
+       const res = await fetch(`/api/comment/likeComment/${commentId}`,{
+        method:'Put'
+       });
+       if(res.ok)
+       {
+        const data = await res.json();
+        setComments(comments.map((comment)=>(
+          comment._id===commentId?{
+            ...comment,
+            likes:data.likes,
+            numberOfLikes:data.likes.length
+          }:comment
+        )))
+        
+       }
+      }
+      catch(error)
+      {
+        console.log(error);
+      }
+    }
   return (
 
     <div className="mx-w-2xl mx-auto w-full p-3">
@@ -80,7 +109,7 @@ export default function CommentSection(post) {
                 <Link to={'/dashboard?tab=profile'} className="text-xs text-cyan-600 hover:underline">@{currentUser.username}</Link>
             </div>
         ):(
-            <div className="text-sm text-teal-500 my-5 flex gap-1">
+            <div className="text-sm text-teal-50 0 my-5 flex gap-1">
                 You must be signed in to comment.
             <Link className="text-blue-500 hover:underline" to={'/sign-in'}>
               Sign In
@@ -130,6 +159,7 @@ export default function CommentSection(post) {
             <Comment
              key={comment._id}
              comment={comment}
+             onLike={handleLike}
             />
           ))
         }
