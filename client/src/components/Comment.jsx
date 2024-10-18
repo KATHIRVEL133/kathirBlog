@@ -1,15 +1,18 @@
+/* eslint-disable react/no-unescaped-entities */
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react"
 import moment from 'moment'
 import {FaThumbsUp} from 'react-icons/fa'
 import { useSelector } from "react-redux";
-import  { Button, Textarea } from 'flowbite-react'
-export default function Comment({comment,onLike,onSave}) 
+import  { Button, Modal, Textarea } from 'flowbite-react'
+import { HiOutlineExclamationCircle } from "react-icons/hi";
+export default function Comment({comment,onLike,onSave,onDelete}) 
 {
   const {currentUser} = useSelector((state)=>state.user)
   const [user,setUser] = useState({});
   const [editing,setEditing] = useState(false);
   const [newComment,setNewComment] = useState('');
+  const [showModal,setShowModal] = useState(false);
   useEffect(()=>
   {
   const getUser =  async ()=>
@@ -77,16 +80,41 @@ export default function Comment({comment,onLike,onSave})
           {comment.numberOfLikes>0&&comment.numberOfLikes+" "+(comment.numberOfLikes===1?"like":"likes")}
         </p>
         {
-          currentUser&&(currentUser._id===comment.userId||currentUser.isAdmin)&&(
+          currentUser&&(currentUser._id===comment.userId||currentUser.isAdmin)&&<>
             <button type="button" onClick={handleEdit} className="text-gray-400 hover:text-blue-500">
             Edit
             </button>
-          )
+            <button onClick={()=>setShowModal(true)} type="button"  className="text-gray-400 hover:text-blue-500">
+             Delete
+            </button>
+          </>
         }
       </div>
         </>
       }
      </div>
+     {
+        showModal&&
+        <Modal show={showModal} popup onClose={()=>setShowModal(false)} size='md'>
+        <Modal.Header/>
+        <Modal.Body>
+         <div className="text-center">
+         <HiOutlineExclamationCircle className="h-14 w-14 text-gray-400 dark:text-gray-200  mb-4 mx-auto"/>
+         <h3 className="mb-5 text-lg text-gray-500 dark:text-gray-400">
+          Are you sure you want to delete this Comment?
+         </h3>
+         <div className="flex justify-between"> 
+         <Button color='failure' onClick={()=>{setShowModal(false),onDelete(comment._id)}}> 
+          Yes,I'm Sure
+         </Button>
+         <Button onClick={()=>setShowModal(false)} color='success'>
+          No,Cancel
+         </Button>
+         </div>
+         </div>
+        </Modal.Body>
+        </Modal>
+      }
     </div>
   )
 }

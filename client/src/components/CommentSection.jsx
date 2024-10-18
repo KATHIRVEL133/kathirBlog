@@ -121,6 +121,27 @@ export default function CommentSection(post) {
       console.log(error);
      }
     }
+    const handleDelete = async (commentId)=>
+    {
+      try
+      {
+      const res = await fetch(`/api/comment/deleteComment/${commentId}`,{
+        method:'Delete'
+      });
+      const data = await res.json();
+      if(res.ok)
+      {
+      const newComments = comments.filter((c)=>c._id!==commentId);
+      setComments(newComments);
+       return ;
+      }
+      console.log(data.message);
+      }
+      catch(error)
+      {
+        console.log(error);
+      }
+    }
   return (
 
     <div className="mx-w-2xl mx-auto w-full p-3">
@@ -185,6 +206,7 @@ export default function CommentSection(post) {
              comment={comment}
              onLike={handleLike}
              onSave={handleSave}
+             onDelete = {handleDelete}
             />
           ))
         }
