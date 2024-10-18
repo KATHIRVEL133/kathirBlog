@@ -97,6 +97,30 @@ export default function CommentSection(post) {
         console.log(error);
       }
     }
+    const handleSave = async (newComment,commentId)=>
+    {
+     try
+     {
+     const res = await fetch(`/api/comment/editComment/${commentId}`,{
+      method:'put',
+      headers:{
+        'Content-Type':'application/json',
+      },
+      body:JSON.stringify({comment:newComment})
+     });
+     const data = await res.json();
+     if(res.ok)
+     {
+     setComments(comments.map((c)=>c._id===commentId?{...c,comment:data.comment}:c));
+     return ;
+     }
+    console.log(data.message);
+     }
+     catch(error)
+     {
+      console.log(error);
+     }
+    }
   return (
 
     <div className="mx-w-2xl mx-auto w-full p-3">
@@ -160,6 +184,7 @@ export default function CommentSection(post) {
              key={comment._id}
              comment={comment}
              onLike={handleLike}
+             onSave={handleSave}
             />
           ))
         }
