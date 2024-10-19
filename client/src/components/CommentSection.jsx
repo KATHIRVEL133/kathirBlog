@@ -4,12 +4,14 @@ import { Link,useNavigate} from "react-router-dom";
 import {Alert, Button, Textarea} from 'flowbite-react'
 import { useEffect, useState } from "react";
 import Comment from "./Comment.jsx";
+
 export default function CommentSection(post) {
     const navigate = useNavigate();
     const {currentUser} = useSelector((state)=>state.user);
     const [comment,setComment] = useState('');
     const [comments,setComments] = useState([]);
     const [commentError,setCommentError] = useState(null);
+
     useEffect(()=>
     {
      const fetchComments = async ()=>
@@ -35,6 +37,7 @@ export default function CommentSection(post) {
      }
      fetchComments();
     },[post.postId]);
+   
     const handleChange = (e)=>
     {
       setComment(e.target.value);
@@ -213,7 +216,7 @@ export default function CommentSection(post) {
           </>
       )
       }
-    
+  
     </div>
   )
 }

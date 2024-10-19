@@ -3,11 +3,14 @@ import {Link, useParams} from 'react-router-dom'
 import {Button, Spinner} from 'flowbite-react'
 import CallToAction from '../components/CallToAction';
 import CommentSection from '../components/CommentSection';
+import PostCard from '../components/PostCard.jsx';
+
 export default function PostPage() {
   const {postSlug} = useParams();
   const [loading,setLoading] = useState(true);
   const [post,setPost] = useState(null);
   const [error,setError] = useState(false);
+  const [recentPosts,setRecentPosts] = useState(null);
   console.log(post);
   useEffect(()=>
   {
@@ -35,6 +38,19 @@ export default function PostPage() {
   }
   fetchPost();
   },[postSlug])
+  useEffect(()=>
+    {
+    const fetchPosts = async ()=>
+    {
+    const res  = await fetch(`/api/post/getPosts?limit=3`);
+    const data = await res.json();
+    if(res.ok)
+    {
+      setRecentPosts(data.posts);
+    }
+    }
+    fetchPosts();
+    },[])
  if(loading) return <div className='flex justify-center items-center min-h-screen'><Spinner size='xl'/></div>
  return <main className='p-3 flex flex-col min-h-screen max-w-6xl mx-auto'>
   <h1 className='text-3xl mt-10 p-3 text-center font-serif max-w-2xl mx-auto lg:text-4xl'>
@@ -62,5 +78,15 @@ export default function PostPage() {
     <CallToAction/>
   </div>
   <CommentSection postId={post._id}/>
+   <div className='flex flex-col justify-center items-center mb-5'>
+    <h1 className='text-xl mt-5'>
+     Recent articles
+    </h1>
+    <div className='flex flex-wrap gap-5 mt-5 justify-center'>
+      {
+        recentPosts&&recentPosts.map((post)=>(<PostCard key={post._id} post={post}></PostCard>))
+      }
+    </div>
+   </div>
   </main>
 }
