@@ -13,6 +13,9 @@ import CreatePost from './pages/CreatePost.jsx'
 import UpdatePost from './pages/UpdatePost.jsx'
 import PostPage from './pages/PostPage.jsx'
 import ScrollToTop from './components/ScrollToTop.jsx'
+import DashBoardPosts from './components/DashBoardPosts.jsx'
+import DashBoardComments from './components/DashBoardComments.jsx'
+import DashBoardUsers from './components/DashBoardUsers.jsx'
 function App() 
 {
   return (
@@ -23,6 +26,9 @@ function App()
       <Route path='/about' element={<About/>}></Route>
       <Route element={<PrivateRoute/>}> 
       <Route path='/dashboard' element={<Dashboard/>}/>
+      <Route path='/dashboard/postPage' element={<DashBoardPosts/>}/>
+      <Route path='/dashboard/commentPage' element={<DashBoardComments/>}/>
+      <Route path='/dashboard/userPage' element={<DashBoardUsers/>}/>
       </Route>
       <Route element={<OnlyAdminPrivateRoute/>}>
       <Route path='/create-post' element={<CreatePost/>}></Route>

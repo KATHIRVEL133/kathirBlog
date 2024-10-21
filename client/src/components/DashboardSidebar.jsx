@@ -1,6 +1,7 @@
 import { Sidebar } from "flowbite-react";
 import { useEffect, useState } from "react";
 import {HiArrowSmRight, HiDocumentText, HiUser} from "react-icons/hi"
+import { MdDashboard } from 'react-icons/md';
 import { FaCommentAlt } from "react-icons/fa";
 import { Link, useLocation } from "react-router-dom";
 import { signOutSuccess } from "../redux/user/userSlice";
@@ -44,6 +45,14 @@ export default function DashboardSidebar() {
     <Sidebar className="w-full md:w-56">
         <Sidebar.Items>
             <Sidebar.ItemGroup className="flex flex-col gap-1">
+               {
+                  currentUser.isAdmin&&
+                  <Link to={'/dashboard?tab=dash'}>
+                    <Sidebar.Item active={tab==='dash'} icon={MdDashboard}>
+                      DashBoard
+                    </Sidebar.Item>
+                  </Link>
+                }
                 <Link to={'/dashboard?tab=profile'}>
                 <Sidebar.Item  active={tab==='profile'} icon={HiUser} label={currentUser.isAdmin?'Admin':'User'} labelColor='dark' as='div'>
                     Profile
@@ -73,6 +82,7 @@ export default function DashboardSidebar() {
                    </Sidebar.Item>
                   </Link>
                 }
+              
                 <Sidebar.Item onClick={handleSignOut} icon={HiArrowSmRight} className='cursor-pointer'>
                     Sign Out
                 </Sidebar.Item>

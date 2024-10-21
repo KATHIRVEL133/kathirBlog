@@ -55,6 +55,10 @@ export const updatePost = async (req,res,next)=>
 }
 export const getposts = async (req,res,next)=>
 {
+if(!req.user.isAdmin)
+{
+     return next(errorHandler(400,'You are not an admin'));
+} 
 try
 {
 const startIndex = parseInt(req.query.startIndex)||0;

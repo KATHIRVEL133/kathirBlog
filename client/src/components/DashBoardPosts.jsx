@@ -81,7 +81,7 @@ export default function DashBoardPosts() {
       console.log(error);
     }
   }
-  return <div className="w-full table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thum-slate-500">
+  return <div className="w-full min-h-screen table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thum-slate-500">
     {
       currentUser.isAdmin&&userposts.length>0?<>
       <Table  hoverable className="shadow-md">
