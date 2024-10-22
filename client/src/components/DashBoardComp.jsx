@@ -87,8 +87,8 @@ export default function DashBoardComp() {
   },[currentUser])
   return (
     <div className="p-3  md:mx-auto">
-      <div className="flex md:flex-row flex-col gap-2 w-full justify-between mb-5">
-        <div className="w-72 shadow-md p-3 dark:bg-slate-800">
+      <div className="flex md:flex-row flex-col gap-2 sm:max-w-6xl w-full justify-between mb-5">
+        <div className="sm:w-72 w-full shadow-md p-3 dark:bg-slate-800">
           <div className="flex  justify-between">
             <div className="">
             <span className="text-gray-400">TOTAL USERS</span>
@@ -106,7 +106,7 @@ export default function DashBoardComp() {
             </p>
           </div>
         </div>
-        <div className="w-72 shadow-md p-3  dark:bg-slate-800">
+        <div className="sm:w-72 w-full shadow-md p-3  dark:bg-slate-800">
           <div className="flex  justify-between">
             <div className="">
             <span className="text-gray-400">TOTAL COMMENTS</span>
@@ -124,7 +124,7 @@ export default function DashBoardComp() {
             </p>
           </div>
         </div>
-        <div className="w-72 shadow-md p-3  dark:bg-slate-800">
+        <div className="sm:w-72 w-full shadow-md p-3  dark:bg-slate-800">
           <div className="flex  justify-between">
             <div className="">
             <span className="text-gray-400">TOTAL POSTS</span>
