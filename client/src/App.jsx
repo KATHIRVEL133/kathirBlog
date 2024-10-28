@@ -16,6 +16,7 @@ import ScrollToTop from './components/ScrollToTop.jsx'
 import DashBoardPosts from './components/DashBoardPosts.jsx'
 import DashBoardComments from './components/DashBoardComments.jsx'
 import DashBoardUsers from './components/DashBoardUsers.jsx'
+import Search from './pages/Search.jsx'
 function App() 
 {
   return (
@@ -39,6 +40,7 @@ function App()
       <Route path='/sign-in' element={<SignIn/>}/>
       <Route path='sign-up' element={<SignUp/>}/>
       <Route path='/post/:postSlug' element={<PostPage/>}></Route>
+      <Route path='/search' element={<Search/>}/>
     </Routes>
     <FooterComponent/>
     </BrowserRouter>

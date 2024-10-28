@@ -7,5 +7,4 @@ router.get('/getposts',getposts);
 router.get('/getpost/:postId',getPost);
 router.delete('/deletePost/:postId/:userId',verifyToken,deletePost);
 router.put('/update/:userId/:postId',verifyToken,updatePost);
-
 export default router;
